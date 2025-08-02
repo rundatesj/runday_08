@@ -6,7 +6,6 @@
     <title>러닝크루 월 마일리지 대결</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
-        /* 기존 스타일 유지 */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #e0f2fe 0%, #e8eaf6 100%); min-height: 100vh; padding: 20px; }
         .container { max-width: 1400px; margin: 0 auto; }
@@ -18,8 +17,8 @@
         .team-card { background: linear-gradient(135deg, #8b5cf6, #9333ea); color: white; padding: 20px; border-radius: 12px; text-align: center; position: relative; }
         .team-card.grape { background: linear-gradient(135deg, #6366f1, #4f46e5); }
         .team-score { font-size: 1.8rem; font-weight: bold; }
-        .chart-container { margin-bottom: 20px; }
-        .chart-canvas { width: 100% !important; height: 300px !important; }
+        .chart-container { height: 350px; position: relative; margin-bottom: 20px; }
+        .chart-canvas { position: absolute; top: 0; left: 0; width: 100% !important; height: 100% !important; }
         table { width: 100%; border-collapse: collapse; }
         table th, table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 0.9rem; }
         .team-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; font-weight: 500; }
@@ -32,22 +31,46 @@
 </head>
 <body>
     <div class="container">
-        <!-- (HTML 구조 동일) -->
-        <!-- header, forms-section, charts-grid, records-section 그대로 유지 -->
+        <!-- 기존 구조 동일 (header, forms-section, charts-grid, records-section) -->
     </div>
     <script>
-        const resizeObserver = new ResizeObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.target.classList.contains('chart-canvas')) {
-                    entry.target.style.height = '300px';
+        // Chart 초기화 시 maintainAspectRatio와 layout 패딩 수정
+        function initializeChart(ctx, config) {
+            return new Chart(ctx, {
+                ...config,
+                options: {
+                    ...config.options,
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: { padding: 0 },
+                    animation: false
                 }
             });
+        }
+
+        // 차트 생성 예시 (teamChart)
+        function updateTeamChart() {
+            const ctx = document.getElementById('teamChart').getContext('2d');
+            if (charts.team) charts.team.destroy();
+
+            const dummyData = [10, 20, 30, 40];
+            charts.team = initializeChart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Day1', 'Day2', 'Day3', 'Day4'],
+                    datasets: [
+                        { label: '🥛 우유팀', data: dummyData, backgroundColor: '#8b5cf6' },
+                        { label: '🍇 포도팀', data: dummyData, backgroundColor: '#6366f1' }
+                    ]
+                },
+                options: { plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTeamChart();
+            // 다른 차트도 동일 방식으로 적용
         });
-        document.querySelectorAll('.chart-canvas').forEach(canvas => resizeObserver.observe(canvas));
-    </script>
-    <script>
-        // 기존 JS 전체 복붙 (Chart.js 관련 및 데이터 로딩 등)
-        // (생략)
     </script>
 </body>
 </html>
