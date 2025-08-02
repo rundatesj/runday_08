@@ -1,4 +1,4 @@
-        function embedForms() {<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -16,59 +16,55 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #e0f2fe 0%, #e8eaf6 100%);
             height: 100vh;
-            overflow: auto; /* 스크롤 허용 */
-            padding: 8px;
+            overflow: hidden;
+            padding: 10px;
         }
         
         .container {
-            height: calc(100vh - 16px);
-            max-height: 900px; /* 최대 높이 제한 */
+            height: calc(100vh - 20px);
             display: grid;
             grid-template-rows: auto 1fr;
-            gap: 8px;
+            gap: 10px;
         }
         
         .header {
             text-align: center;
             background: white;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 15px;
+            border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
         .header h1 {
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             color: #374151;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
         }
         
         .header p {
             color: #6b7280;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
         
         .main-content {
             display: grid;
-            grid-template-columns: 280px 1fr 280px;
-            gap: 8px;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 10px;
             height: 100%;
-            min-height: 600px; /* 최소 높이 보장 */
         }
         
         .left-panel, .right-panel {
             background: white;
-            border-radius: 8px;
-            padding: 12px;
+            border-radius: 12px;
+            padding: 15px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             overflow-y: auto;
-            max-height: calc(100vh - 120px); /* 높이 제한 */
         }
         
         .center-panel {
             display: grid;
             grid-template-rows: auto 1fr auto;
-            gap: 8px;
-            min-height: 600px; /* 최소 높이 보장 */
+            gap: 10px;
         }
         
         .team-cards {
@@ -113,48 +109,44 @@
         
         .chart-container {
             background: white;
-            border-radius: 8px;
-            padding: 12px;
+            border-radius: 12px;
+            padding: 15px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            min-height: 250px; /* 최소 높이 보장 */
         }
         
         .chart-container h3 {
             color: #374151;
-            margin-bottom: 8px;
-            font-size: 0.95rem;
+            margin-bottom: 10px;
+            font-size: 1rem;
         }
         
         .mini-charts {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            min-height: 150px; /* 최소 높이 보장 */
+            gap: 10px;
         }
         
         .mini-chart {
             background: white;
-            border-radius: 8px;
-            padding: 10px;
+            border-radius: 12px;
+            padding: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
         .mini-chart h4 {
             color: #374151;
-            margin-bottom: 6px;
-            font-size: 0.85rem;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
         }
         
         .chart-canvas {
             width: 100%;
-            height: 100px; /* 높이 줄임 */
+            height: 120px;
         }
         
         .main-chart-canvas {
             width: 100%;
-            height: calc(100% - 30px);
-            min-height: 200px; /* 최소 높이 보장 */
-            max-height: 250px; /* 최대 높이 제한 */
+            height: calc(100% - 40px);
         }
         
         .setup-section {
@@ -269,8 +261,8 @@
         
         .iframe-container {
             width: 100%;
-            height: 280px; /* 높이 줄임 */
-            border-radius: 6px;
+            height: 350px;
+            border-radius: 8px;
             overflow: hidden;
             border: 1px solid #e5e7eb;
         }
@@ -321,9 +313,7 @@
         <div class="main-content">
             <!-- 왼쪽 패널: 설정 -->
             <div class="left-panel">
-                <!-- 설정 토글은 JavaScript에서 자동 추가됨 -->
-                
-                <!-- CSV 설정 (기본 숨김) -->
+                <!-- CSV 설정 -->
                 <div class="setup-section">
                     <h3>📊 데이터 연결</h3>
                     <div class="input-group">
@@ -334,7 +324,7 @@
                     </div>
                 </div>
 
-                <!-- Forms 설정 (기본 숨김) -->
+                <!-- Forms 설정 -->
                 <div class="setup-section">
                     <h3>📝 Forms 연결</h3>
                     <div class="input-group">
@@ -344,12 +334,12 @@
                     </div>
                 </div>
 
-                <!-- Google Forms (항상 표시) -->
+                <!-- Google Forms -->
                 <div class="setup-section">
                     <h3>🏃‍♂️ 기록 입력</h3>
                     <div class="iframe-container" id="forms-container">
                         <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #6b7280; text-align: center; font-size: 0.9rem;">
-                            로딩 중...
+                            Forms 연결 후<br>여기서 기록 입력
                         </div>
                     </div>
                 </div>
@@ -400,7 +390,7 @@
                         <button class="btn" onclick="loadData()" style="width: auto; padding: 4px 8px; font-size: 0.8rem;">🔄</button>
                     </div>
                     
-                    <div style="max-height: calc(100vh - 300px); overflow-y: auto;">
+                    <div style="max-height: calc(100vh - 200px); overflow-y: auto;">
                         <table class="records-table">
                             <thead>
                                 <tr>
@@ -436,61 +426,21 @@
         
         // 초기화
         document.addEventListener('DOMContentLoaded', function() {
-            // 자동으로 기본 설정 적용
-            const DEFAULT_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSxKnN2BUIBcbNrpywGy2F_YjLnzWjabSOSCO_Kmwnq-mvia1E6g4ezt5nwwEj-3CWblrJO1xjaLTk/pub?output=csv';
-            const DEFAULT_FORMS_EMBED = '<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfToqiLU4-8Ckl23xO3y_r6dvjSDheU6TgALlvd2QT0e0na-Q/viewform?embedded=true" width="100%" height="280" frameborder="0">로드 중…</iframe>';
+            const savedCsvUrl = localStorage.getItem('csvUrl');
+            const savedFormsEmbed = localStorage.getItem('formsEmbed');
             
-            // 로컬 스토리지에서 설정 불러오기 (없으면 기본값 사용)
-            const savedCsvUrl = localStorage.getItem('csvUrl') || DEFAULT_CSV_URL;
-            const savedFormsEmbed = localStorage.getItem('formsEmbed') || DEFAULT_FORMS_EMBED;
+            if (savedCsvUrl) {
+                document.getElementById('csvUrl').value = savedCsvUrl;
+                loadData();
+            }
             
-            // 자동으로 설정 적용
-            document.getElementById('csvUrl').value = savedCsvUrl;
-            document.getElementById('formsEmbed').value = savedFormsEmbed;
-            
-            // 자동으로 연결 실행
-            embedForms();
-            loadData();
-            
-            // 설정 섹션 숨기기 (필요시 토글 가능)
-            const setupSections = document.querySelectorAll('.setup-section');
-            setupSections[0].style.display = 'none'; // CSV 설정 숨김
-            setupSections[1].style.display = 'none'; // Forms 설정 숨김
-            
-            // 설정 토글 버튼 추가
-            addSettingsToggle();
+            if (savedFormsEmbed) {
+                document.getElementById('formsEmbed').value = savedFormsEmbed;
+                embedForms();
+            }
         });
         
-        // 설정 토글 버튼 추가
-        function addSettingsToggle() {
-            const leftPanel = document.querySelector('.left-panel');
-            
-            // 토글 버튼 생성
-            const toggleBtn = document.createElement('div');
-            toggleBtn.innerHTML = `
-                <div style="text-align: center; margin-bottom: 15px;">
-                    <button class="btn" onclick="toggleSettings()" id="toggle-btn" style="font-size: 0.8rem; padding: 6px 12px;">
-                        ⚙️ 관리자 설정
-                    </button>
-                </div>
-            `;
-            
-            // 첫 번째 자식으로 추가
-            leftPanel.insertBefore(toggleBtn, leftPanel.firstChild);
-        }
-        
-        // 설정 토글 함수
-        function toggleSettings() {
-            const setupSections = document.querySelectorAll('.setup-section');
-            const toggleBtn = document.getElementById('toggle-btn');
-            
-            const isHidden = setupSections[0].style.display === 'none';
-            
-            setupSections[0].style.display = isHidden ? 'block' : 'none'; // CSV 설정
-            setupSections[1].style.display = isHidden ? 'block' : 'none'; // Forms 설정
-            
-            toggleBtn.textContent = isHidden ? '❌ 설정 숨기기' : '⚙️ 관리자 설정';
-        }
+        function embedForms() {
             const embedCode = document.getElementById('formsEmbed').value.trim();
             const container = document.getElementById('forms-container');
             
