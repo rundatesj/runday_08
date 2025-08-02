@@ -552,9 +552,36 @@
         }
         
         function updateCharts() {
+            // 모든 canvas 크기 강제 리셋
+            resetCanvasSize();
             updateMainChart();
             updatePieChart();
             updatePersonalChart();
+        }
+        
+        // Canvas 크기 강제 리셋 함수
+        function resetCanvasSize() {
+            const mainCanvas = document.getElementById('mainChart');
+            const pieCanvas = document.getElementById('pieChart');
+            const personalCanvas = document.getElementById('personalChart');
+            
+            // 기존 스타일 완전히 제거
+            mainCanvas.style.cssText = '';
+            pieCanvas.style.cssText = '';
+            personalCanvas.style.cssText = '';
+            
+            // 크기 강제 설정
+            mainCanvas.style.width = '100%';
+            mainCanvas.style.height = '100%';
+            mainCanvas.style.maxHeight = '300px';
+            
+            pieCanvas.style.width = '100%';
+            pieCanvas.style.height = '120px';
+            pieCanvas.style.maxHeight = '120px';
+            
+            personalCanvas.style.width = '100%';
+            personalCanvas.style.height = '120px';
+            personalCanvas.style.maxHeight = '120px';
         }
         
         function updateMainChart() {
@@ -565,6 +592,11 @@
                 charts.main.destroy();
                 charts.main = null;
             }
+            
+            // Canvas 강제 리셋
+            const canvas = ctx.canvas;
+            canvas.width = canvas.offsetWidth;
+            canvas.height = 300; // 고정 높이
             
             const dailyData = {};
             records.forEach(r => {
@@ -593,8 +625,10 @@
                     ]
                 },
                 options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
+                    responsive: false, // responsive 끄기
+                    maintainAspectRatio: false,
+                    width: canvas.width,
+                    height: 300,
                     scales: { y: { beginAtZero: true } },
                     plugins: { legend: { position: 'top' } }
                 }
@@ -610,6 +644,11 @@
                 charts.pie = null;
             }
             
+            // Canvas 강제 리셋
+            const canvas = ctx.canvas;
+            canvas.width = canvas.offsetWidth;
+            canvas.height = 120; // 고정 높이
+            
             const totals = { '우유': 0, '포도': 0 };
             records.forEach(r => totals[r.team] += r.distance);
             
@@ -624,8 +663,10 @@
                     }]
                 },
                 options: {
-                    responsive: true,
+                    responsive: false, // responsive 끄기
                     maintainAspectRatio: false,
+                    width: canvas.width,
+                    height: 120,
                     plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }
                 }
             });
@@ -639,6 +680,11 @@
                 charts.personal.destroy();
                 charts.personal = null;
             }
+            
+            // Canvas 강제 리셋
+            const canvas = ctx.canvas;
+            canvas.width = canvas.offsetWidth;
+            canvas.height = 120; // 고정 높이
             
             const totals = {};
             records.forEach(r => totals[r.userId] = (totals[r.userId] || 0) + r.distance);
@@ -659,8 +705,10 @@
                     }]
                 },
                 options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
+                    responsive: false, // responsive 끄기
+                    maintainAspectRatio: false,
+                    width: canvas.width,
+                    height: 120,
                     scales: { y: { beginAtZero: true } },
                     plugins: { legend: { display: false } }
                 }
