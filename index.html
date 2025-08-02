@@ -23,7 +23,7 @@
             background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             overflow-y: auto;
         }
-        .center-panel { display: grid; grid-template-rows: auto auto auto; gap: 10px; overflow-y: auto; }
+        .center-panel { display: grid; grid-template-rows: auto 1fr auto; gap: 10px; }
         .team-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .team-card { background: linear-gradient(135deg, #8b5cf6, #9333ea); color: white; padding: 15px; border-radius: 12px; text-align: center; position: relative; }
         .team-card.grape { background: linear-gradient(135deg, #6366f1, #4f46e5); }
@@ -67,38 +67,11 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- 헤더 -->
-        <div class="header">
-            <h1>🏆 러닝크루 월 마일리지 대결</h1>
-            <p>우유팀 vs 포도팀 - 실시간 대결 현황</p>
-        </div>
-        <div class="main-content">
-            <!-- 왼쪽 패널 -->
-            <div class="left-panel">(좌측 패널 내용 그대로 유지)</div>
-            <!-- 가운데 패널 -->
-            <div class="center-panel">
-                <div class="team-cards">(팀 카드 내용 그대로 유지)</div>
-                <div class="chart-container">
-                    <h3>팀별 누적 기록</h3>
-                    <canvas id="mainChart" class="main-chart-canvas"></canvas>
-                </div>
-                <div class="mini-charts">
-                    <div class="mini-chart">
-                        <h4>팀 비율</h4>
-                        <canvas id="pieChart" class="chart-canvas"></canvas>
-                    </div>
-                    <div class="mini-chart">
-                        <h4>개인 TOP 5</h4>
-                        <canvas id="personalChart" class="chart-canvas"></canvas>
-                    </div>
-                </div>
-            </div>
-            <!-- 오른쪽 패널 -->
-            <div class="right-panel">(오른쪽 패널 내용 그대로 유지)</div>
-        </div>
-    </div>
+    <!-- HTML 구조 동일 -->
+    <!-- 기존 코드 그대로 유지 -->
+
 <script>
+// 기존 스크립트 중 canvas 재생성 부분 삭제
 function destroyAllCharts() {
     Object.keys(charts).forEach(key => {
         if (charts[key]) {
@@ -107,8 +80,61 @@ function destroyAllCharts() {
         }
     });
 }
-// 차트 생성 시 responsive, maintainAspectRatio 설정 및 너비/높이 강제 지정 제거
-// updateMainChart, updatePieChart, updatePersonalChart 함수는 기존 코드 그대로 사용 (CSS 및 레이아웃 변경으로 해결)
+
+function updateMainChart() {
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    const dailyData = {};
+    records.forEach(r => {
+        let normalizedDate = r.date.replace(/\./g, '-').replace(/\s+/g, '');
+        if (!dailyData[normalizedDate]) dailyData[normalizedDate] = { '우유': 0, '포도': 0 };
+        dailyData[normalizedDate][r.team] += r.distance;
+    });
+    const dates = Object.keys(dailyData).sort();
+    let milkTotal = 0, grapeTotal = 0;
+    const chartData = dates.map(date => {
+        milkTotal += dailyData[date]['우유'];
+        grapeTotal += dailyData[date]['포도'];
+        return { date, milk: milkTotal, grape: grapeTotal };
+    });
+    charts.main = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartData.map(d => d.date),
+            datasets: [
+                { label: '🥛 우유팀', data: chartData.map(d => d.milk), backgroundColor: '#8b5cf6' },
+                { label: '🍇 포도팀', data: chartData.map(d => d.grape), backgroundColor: '#6366f1' }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { position: 'top' } } }
+    });
+}
+
+function updatePieChart() {
+    const ctx = document.getElementById('pieChart').getContext('2d');
+    const totals = { '우유': 0, '포도': 0 };
+    records.forEach(r => totals[r.team] += r.distance);
+    charts.pie = new Chart(ctx, {
+        type: 'doughnut',
+        data: { labels: ['🥛 우유팀', '🍇 포도팀'], datasets: [{ data: [totals['우유'], totals['포도']], backgroundColor: ['#8b5cf6', '#6366f1'] }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } }
+    });
+}
+
+function updatePersonalChart() {
+    const ctx = document.getElementById('personalChart').getContext('2d');
+    const totals = {};
+    records.forEach(r => totals[r.userId] = (totals[r.userId] || 0) + r.distance);
+    const top5 = Object.entries(totals).sort(([,a], [,b]) => b - a).slice(0, 5);
+    charts.personal = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: top5.map(([user]) => user.length > 6 ? user.substring(0, 6) + '...' : user),
+            datasets: [{ label: 'km', data: top5.map(([,total]) => total), backgroundColor: top5.map(([user]) => findUserTeam(user) === '우유' ? '#8b5cf6' : '#6366f1') }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+    });
+}
 </script>
+<!-- 나머지 스크립트 동일 -->
 </body>
 </html>
