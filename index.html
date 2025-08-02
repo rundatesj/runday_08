@@ -552,51 +552,69 @@
         }
         
         function updateCharts() {
-            // 모든 canvas 크기 강제 리셋
-            resetCanvasSize();
-            updateMainChart();
-            updatePieChart();
-            updatePersonalChart();
+            // 차트 업데이트 전에 완전히 초기화
+            destroyAllCharts();
+            
+            // 잠시 대기 후 새 차트 생성
+            setTimeout(() => {
+                updateMainChart();
+                updatePieChart();
+                updatePersonalChart();
+            }, 100);
         }
         
-        // Canvas 크기 강제 리셋 함수
-        function resetCanvasSize() {
-            const mainCanvas = document.getElementById('mainChart');
-            const pieCanvas = document.getElementById('pieChart');
-            const personalCanvas = document.getElementById('personalChart');
+        // 차트 완전 초기화 함수
+        function destroyAllCharts() {
+            // 모든 기존 차트 완전 파괴
+            Object.keys(charts).forEach(key => {
+                if (charts[key]) {
+                    charts[key].destroy();
+                    delete charts[key];
+                }
+            });
             
-            // 기존 스타일 완전히 제거
-            mainCanvas.style.cssText = '';
-            pieCanvas.style.cssText = '';
-            personalCanvas.style.cssText = '';
+            // Canvas 요소들 완전 재생성
+            recreateCanvasElements();
+        }
+        
+        // Canvas 요소 재생성
+        function recreateCanvasElements() {
+            // 메인 차트 Canvas 재생성
+            const mainContainer = document.getElementById('mainChart').parentNode;
+            const oldMain = document.getElementById('mainChart');
+            const newMain = document.createElement('canvas');
+            newMain.id = 'mainChart';
+            newMain.className = 'main-chart-canvas';
+            newMain.style.width = '100%';
+            newMain.style.height = '100%';
+            newMain.style.maxHeight = '300px';
+            mainContainer.replaceChild(newMain, oldMain);
             
-            // 크기 강제 설정
-            mainCanvas.style.width = '100%';
-            mainCanvas.style.height = '100%';
-            mainCanvas.style.maxHeight = '300px';
+            // 파이 차트 Canvas 재생성
+            const pieContainer = document.getElementById('pieChart').parentNode;
+            const oldPie = document.getElementById('pieChart');
+            const newPie = document.createElement('canvas');
+            newPie.id = 'pieChart';
+            newPie.className = 'chart-canvas';
+            newPie.style.width = '100%';
+            newPie.style.height = '120px';
+            newPie.style.maxHeight = '120px';
+            pieContainer.replaceChild(newPie, oldPie);
             
-            pieCanvas.style.width = '100%';
-            pieCanvas.style.height = '120px';
-            pieCanvas.style.maxHeight = '120px';
-            
-            personalCanvas.style.width = '100%';
-            personalCanvas.style.height = '120px';
-            personalCanvas.style.maxHeight = '120px';
+            // 개인별 차트 Canvas 재생성
+            const personalContainer = document.getElementById('personalChart').parentNode;
+            const oldPersonal = document.getElementById('personalChart');
+            const newPersonal = document.createElement('canvas');
+            newPersonal.id = 'personalChart';
+            newPersonal.className = 'chart-canvas';
+            newPersonal.style.width = '100%';
+            newPersonal.style.height = '120px';
+            newPersonal.style.maxHeight = '120px';
+            personalContainer.replaceChild(newPersonal, oldPersonal);
         }
         
         function updateMainChart() {
             const ctx = document.getElementById('mainChart').getContext('2d');
-            
-            // 기존 차트 완전히 파괴
-            if (charts.main) {
-                charts.main.destroy();
-                charts.main = null;
-            }
-            
-            // Canvas 강제 리셋
-            const canvas = ctx.canvas;
-            canvas.width = canvas.offsetWidth;
-            canvas.height = 300; // 고정 높이
             
             const dailyData = {};
             records.forEach(r => {
@@ -625,9 +643,9 @@
                     ]
                 },
                 options: { 
-                    responsive: false, // responsive 끄기
+                    responsive: false,
                     maintainAspectRatio: false,
-                    width: canvas.width,
+                    width: ctx.canvas.offsetWidth,
                     height: 300,
                     scales: { y: { beginAtZero: true } },
                     plugins: { legend: { position: 'top' } }
@@ -638,21 +656,9 @@
         function updatePieChart() {
             const ctx = document.getElementById('pieChart').getContext('2d');
             
-            // 기존 차트 완전히 파괴
-            if (charts.pie) {
-                charts.pie.destroy();
-                charts.pie = null;
-            }
-            
-            // Canvas 강제 리셋
-            const canvas = ctx.canvas;
-            canvas.width = canvas.offsetWidth;
-            canvas.height = 120; // 고정 높이
-            
             const totals = { '우유': 0, '포도': 0 };
             records.forEach(r => totals[r.team] += r.distance);
             
-            // 새 차트 생성
             charts.pie = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
@@ -663,9 +669,9 @@
                     }]
                 },
                 options: {
-                    responsive: false, // responsive 끄기
+                    responsive: false,
                     maintainAspectRatio: false,
-                    width: canvas.width,
+                    width: ctx.canvas.offsetWidth,
                     height: 120,
                     plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }
                 }
@@ -675,17 +681,6 @@
         function updatePersonalChart() {
             const ctx = document.getElementById('personalChart').getContext('2d');
             
-            // 기존 차트 완전히 파괴
-            if (charts.personal) {
-                charts.personal.destroy();
-                charts.personal = null;
-            }
-            
-            // Canvas 강제 리셋
-            const canvas = ctx.canvas;
-            canvas.width = canvas.offsetWidth;
-            canvas.height = 120; // 고정 높이
-            
             const totals = {};
             records.forEach(r => totals[r.userId] = (totals[r.userId] || 0) + r.distance);
             
@@ -693,7 +688,6 @@
                 .sort(([,a], [,b]) => b - a)
                 .slice(0, 5);
             
-            // 새 차트 생성
             charts.personal = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -705,9 +699,9 @@
                     }]
                 },
                 options: { 
-                    responsive: false, // responsive 끄기
+                    responsive: false,
                     maintainAspectRatio: false,
-                    width: canvas.width,
+                    width: ctx.canvas.offsetWidth,
                     height: 120,
                     scales: { y: { beginAtZero: true } },
                     plugins: { legend: { display: false } }
