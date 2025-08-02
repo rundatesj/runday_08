@@ -34,9 +34,15 @@
         <!-- 기존 구조 동일 (header, forms-section, charts-grid, records-section) -->
     </div>
     <script>
-        // Chart 초기화 시 maintainAspectRatio와 layout 패딩 수정
+        function fixCanvasHeight() {
+            document.querySelectorAll('.chart-canvas').forEach(canvas => {
+                canvas.style.height = '350px';
+                canvas.height = 350;
+            });
+        }
+
         function initializeChart(ctx, config) {
-            return new Chart(ctx, {
+            const chart = new Chart(ctx, {
                 ...config,
                 options: {
                     ...config.options,
@@ -46,15 +52,16 @@
                     animation: false
                 }
             });
+            fixCanvasHeight();
+            return chart;
         }
 
-        // 차트 생성 예시 (teamChart)
         function updateTeamChart() {
             const ctx = document.getElementById('teamChart').getContext('2d');
-            if (charts.team) charts.team.destroy();
+            if (window.teamChartInstance) window.teamChartInstance.destroy();
 
             const dummyData = [10, 20, 30, 40];
-            charts.team = initializeChart(ctx, {
+            window.teamChartInstance = initializeChart(ctx, {
                 type: 'bar',
                 data: {
                     labels: ['Day1', 'Day2', 'Day3', 'Day4'],
@@ -67,9 +74,47 @@
             });
         }
 
+        function updatePersonalChart() {
+            const ctx = document.getElementById('personalChart').getContext('2d');
+            if (window.personalChartInstance) window.personalChartInstance.destroy();
+
+            const dummyData = [15, 25, 35, 45];
+            window.personalChartInstance = initializeChart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['User1', 'User2', 'User3', 'User4'],
+                    datasets: [{
+                        label: '누적 거리 (km)',
+                        data: dummyData,
+                        backgroundColor: ['#8b5cf6', '#6366f1', '#8b5cf6', '#6366f1']
+                    }]
+                },
+                options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        function updateMiniChart() {
+            const ctx = document.getElementById('miniChart').getContext('2d');
+            if (window.miniChartInstance) window.miniChartInstance.destroy();
+
+            const dummyData = [50, 50];
+            window.miniChartInstance = initializeChart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['🥛 우유팀', '🍇 포도팀'],
+                    datasets: [{
+                        data: dummyData,
+                        backgroundColor: ['#8b5cf6', '#6366f1']
+                    }]
+                },
+                options: { plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             updateTeamChart();
-            // 다른 차트도 동일 방식으로 적용
+            updatePersonalChart();
+            updateMiniChart();
         });
     </script>
 </body>
