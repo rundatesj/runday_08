@@ -6,145 +6,77 @@
     <title>러닝크루 월 마일리지 대결</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f0f0f0; margin: 20px; }
-        .chart-container { width: 100%; overflow-x: auto; margin-bottom: 40px; }
-        canvas { height: 400px !important; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #e0f2fe 0%, #e8eaf6 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
         .header { text-align: center; margin-bottom: 30px; }
-        .header h1 { font-size: 2rem; }
-        .status { text-align: center; margin: 20px 0; font-weight: bold; }
+        .header h1 { font-size: 2.5rem; color: #374151; margin-bottom: 10px; }
+        .charts-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 30px; }
+        .chart-container { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow-x: auto; }
+        .chart-container h3 { color: #374151; margin-bottom: 15px; font-size: 1.1rem; }
+        .chart-canvas { min-width: 800px; height: 400px !important; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>러닝크루 월 마일리지 대결</h1>
-        <p>Team 우유 vs Team 포도 - Google Forms로 간편하게 기록하세요!</p>
-    </div>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 러닝크루 월 마일리지 대결</h1>
+            <p>Team 우유 vs Team 포도 - Google Forms로 간편하게 기록하세요!</p>
+        </div>
 
-    <div class="chart-container">
-        <canvas id="teamChart"></canvas>
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h3>팀별 누적 기록</h3>
+                <canvas id="teamChart" class="chart-canvas"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>개인별 TOP 10</h3>
+                <canvas id="personalChart" class="chart-canvas"></canvas>
+            </div>
+        </div>
     </div>
-    <div class="chart-container">
-        <canvas id="personalChart"></canvas>
-    </div>
-
-    <div style="text-align: center;">
-        <label><strong>Google 스프레드시트 CSV URL:</strong></label>
-        <input type="url" id="csvUrl" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv" style="width: 60%; padding: 8px;">
-        <button onclick="loadData()" style="padding: 8px 16px; margin-left: 10px;">데이터 로드</button>
-    </div>
-
-    <div id="status" class="status"></div>
 
     <script>
-        let records = [];
-
-        async function loadData() {
-            const csvUrl = document.getElementById('csvUrl').value.trim();
-            if (!csvUrl) {
-                showStatus('CSV URL을 입력해주세요.');
-                return;
-            }
-            try {
-                showStatus('데이터 로드 중...');
-                const response = await fetch(csvUrl);
-                const csvText = await response.text();
-                records = parseCSV(csvText);
-                showStatus(`${records.length}개 기록 로드 완료!`);
-                updateCharts();
-            } catch (e) {
-                showStatus(`로드 실패: ${e.message}`);
-            }
-        }
-
-        function parseCSV(csvText) {
-            const lines = csvText.trim().split('\n');
-            const data = [];
-            for (let i = 1; i < lines.length; i++) {
-                const cols = lines[i].split(',');
-                if (cols.length >= 5) {
-                    data.push({
-                        timestamp: cols[0].trim(),
-                        userId: cols[1].trim(),
-                        date: cols[3].trim(),
-                        distance: parseFloat(cols[4].trim()),
-                        team: findUserTeam(cols[1].trim())
-                    });
-                }
-            }
-            return data.filter(r => r.team);
-        }
-
-        const crewMembers = {
-            '우유': ['goinggoing', 'JS Jeon', 'NJ_Run', '거북아달려', '검단이봉주', '겨자색슈즈', '돌아온빵꾸', '마커스', '먕먐', '물냉명', '봉무동러너', '삼남매맘', '상우쌍우', '세동이', '신욱재', '우유키', '후니'],
-            '포도': ['권초게', '라꾸라꾸조깅', '마이세트', '뭉공주', '바다', '삐약비약', '수다맘', '술우', '얼쑤야', '윤호근', '이응내', '자달매', '정영준', '하늘은평', '하하하양', '해피러너', '후다닭']
+        const teamData = {
+            labels: ['8/1', '8/2', '8/3', '8/4', '8/5', '8/6', '8/7', '8/8', '8/9', '8/10'],
+            datasets: [
+                { label: '우유팀', data: [10, 20, 30, 50, 70, 90, 110, 130, 150, 170], backgroundColor: '#8b5cf6' },
+                { label: '포도팀', data: [15, 25, 40, 55, 80, 100, 120, 145, 165, 180], backgroundColor: '#6366f1' }
+            ]
         };
 
-        function findUserTeam(userId) {
-            for (const [team, members] of Object.entries(crewMembers)) {
-                if (members.includes(userId)) return team;
+        const personalData = {
+            labels: ['Runner1', 'Runner2', 'Runner3', 'Runner4', 'Runner5', 'Runner6', 'Runner7', 'Runner8', 'Runner9', 'Runner10'],
+            datasets: [{
+                label: '누적 거리 (km)',
+                data: [100, 95, 90, 85, 80, 75, 70, 65, 60, 55],
+                backgroundColor: ['#8b5cf6', '#8b5cf6', '#8b5cf6', '#6366f1', '#6366f1', '#6366f1', '#8b5cf6', '#8b5cf6', '#6366f1', '#6366f1']
+            }]
+        };
+
+        new Chart(document.getElementById('teamChart').getContext('2d'), {
+            type: 'bar',
+            data: teamData,
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { x: { beginAtZero: true } },
+                plugins: { legend: { position: 'bottom' } }
             }
-            return null;
-        }
+        });
 
-        let teamChart, personalChart;
-
-        function updateCharts() {
-            const teamTotals = { '우유': 0, '포도': 0 };
-            const personalTotals = {};
-
-            records.forEach(r => {
-                teamTotals[r.team] += r.distance;
-                personalTotals[r.userId] = (personalTotals[r.userId] || 0) + r.distance;
-            });
-
-            // 팀별 누적 차트
-            if (teamChart) teamChart.destroy();
-            teamChart = new Chart(document.getElementById('teamChart').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: ['우유팀', '포도팀'],
-                    datasets: [{
-                        label: '누적 거리 (km)',
-                        data: [teamTotals['우유'], teamTotals['포도']],
-                        backgroundColor: ['#8b5cf6', '#6366f1']
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { x: { beginAtZero: true } },
-                    plugins: { legend: { display: false } }
-                }
-            });
-
-            // 개인별 Top 10 차트
-            const top10 = Object.entries(personalTotals).sort((a,b) => b[1] - a[1]).slice(0,10);
-
-            if (personalChart) personalChart.destroy();
-            personalChart = new Chart(document.getElementById('personalChart').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: top10.map(([user]) => user),
-                    datasets: [{
-                        label: '누적 거리 (km)',
-                        data: top10.map(([_, dist]) => dist),
-                        backgroundColor: top10.map(([user]) => crewMembers['우유'].includes(user) ? '#8b5cf6' : '#6366f1')
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { x: { beginAtZero: true } },
-                    plugins: { legend: { display: false } }
-                }
-            });
-        }
-
-        function showStatus(msg) {
-            document.getElementById('status').textContent = msg;
-        }
+        new Chart(document.getElementById('personalChart').getContext('2d'), {
+            type: 'bar',
+            data: personalData,
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { x: { beginAtZero: true } },
+                plugins: { legend: { display: false } }
+            }
+        });
     </script>
 </body>
 </html>
