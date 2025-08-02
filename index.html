@@ -34,15 +34,8 @@
         <!-- 기존 구조 동일 (header, forms-section, charts-grid, records-section) -->
     </div>
     <script>
-        function fixCanvasHeight() {
-            document.querySelectorAll('.chart-canvas').forEach(canvas => {
-                canvas.style.height = '350px';
-                canvas.height = 350;
-            });
-        }
-
         function initializeChart(ctx, config) {
-            const chart = new Chart(ctx, {
+            return new Chart(ctx, {
                 ...config,
                 options: {
                     ...config.options,
@@ -52,8 +45,6 @@
                     animation: false
                 }
             });
-            fixCanvasHeight();
-            return chart;
         }
 
         function updateTeamChart() {
@@ -70,7 +61,11 @@
                         { label: '🍇 포도팀', data: dummyData, backgroundColor: '#6366f1' }
                     ]
                 },
-                options: { plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } }
+                options: {
+                    indexAxis: 'y',
+                    plugins: { legend: { position: 'top' } },
+                    scales: { x: { beginAtZero: true } }
+                }
             });
         }
 
@@ -89,7 +84,11 @@
                         backgroundColor: ['#8b5cf6', '#6366f1', '#8b5cf6', '#6366f1']
                     }]
                 },
-                options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+                options: {
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true } }
+                }
             });
         }
 
