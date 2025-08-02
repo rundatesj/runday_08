@@ -559,7 +559,12 @@
         
         function updateMainChart() {
             const ctx = document.getElementById('mainChart').getContext('2d');
-            if (charts.main) charts.main.destroy();
+            
+            // 기존 차트 완전히 파괴
+            if (charts.main) {
+                charts.main.destroy();
+                charts.main = null;
+            }
             
             const dailyData = {};
             records.forEach(r => {
@@ -577,6 +582,7 @@
                 return { date, milk: milkTotal, grape: grapeTotal };
             });
             
+            // 새 차트 생성
             charts.main = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -597,11 +603,17 @@
         
         function updatePieChart() {
             const ctx = document.getElementById('pieChart').getContext('2d');
-            if (charts.pie) charts.pie.destroy();
+            
+            // 기존 차트 완전히 파괴
+            if (charts.pie) {
+                charts.pie.destroy();
+                charts.pie = null;
+            }
             
             const totals = { '우유': 0, '포도': 0 };
             records.forEach(r => totals[r.team] += r.distance);
             
+            // 새 차트 생성
             charts.pie = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
@@ -621,7 +633,12 @@
         
         function updatePersonalChart() {
             const ctx = document.getElementById('personalChart').getContext('2d');
-            if (charts.personal) charts.personal.destroy();
+            
+            // 기존 차트 완전히 파괴
+            if (charts.personal) {
+                charts.personal.destroy();
+                charts.personal = null;
+            }
             
             const totals = {};
             records.forEach(r => totals[r.userId] = (totals[r.userId] || 0) + r.distance);
@@ -630,6 +647,7 @@
                 .sort(([,a], [,b]) => b - a)
                 .slice(0, 5);
             
+            // 새 차트 생성
             charts.personal = new Chart(ctx, {
                 type: 'bar',
                 data: {
