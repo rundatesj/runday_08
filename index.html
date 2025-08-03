@@ -313,43 +313,33 @@
         <div class="main-content">
             <!-- 왼쪽 패널: 설정 -->
             <div class="left-panel">
-                <!-- 관리자 설정 토글 버튼 -->
-                <div style="text-align: center; margin-bottom: 15px;">
-                    <button class="btn" onclick="toggleAdminSettings()" id="admin-toggle" style="width: auto; padding: 6px 12px; font-size: 0.8rem; background: #6b7280;">
-                        ⚙️ 관리자 설정
-                    </button>
-                </div>
-
-                <!-- 관리자 설정 영역 (기본 숨김) -->
-                <div id="admin-settings" style="display: none;">
-                    <!-- CSV 설정 -->
-                    <div class="setup-section">
-                        <h3>📊 데이터 연결</h3>
-                        <div class="input-group">
-                            <label>스프레드시트 CSV URL</label>
-                            <input type="url" id="csvUrl" placeholder="CSV URL을 입력하세요">
-                            <button class="btn" onclick="loadData()">데이터 로드</button>
-                            <div id="status"></div>
-                        </div>
-                    </div>
-
-                    <!-- Forms 설정 -->
-                    <div class="setup-section">
-                        <h3>📝 Forms 연결</h3>
-                        <div class="input-group">
-                            <label>Google Forms 임베드 코드</label>
-                            <textarea id="formsEmbed" placeholder="<iframe src=...></iframe>"></textarea>
-                            <button class="btn" onclick="embedForms()">Forms 연결</button>
-                        </div>
+                <!-- CSV 설정 -->
+                <div class="setup-section">
+                    <h3>📊 데이터 연결</h3>
+                    <div class="input-group">
+                        <label>스프레드시트 CSV URL</label>
+                        <input type="url" id="csvUrl" placeholder="CSV URL을 입력하세요">
+                        <button class="btn" onclick="loadData()">데이터 로드</button>
+                        <div id="status"></div>
                     </div>
                 </div>
 
-                <!-- Google Forms (항상 표시) -->
+                <!-- Forms 설정 -->
+                <div class="setup-section">
+                    <h3>📝 Forms 연결</h3>
+                    <div class="input-group">
+                        <label>Google Forms 임베드 코드</label>
+                        <textarea id="formsEmbed" placeholder="<iframe src=...></iframe>"></textarea>
+                        <button class="btn" onclick="embedForms()">Forms 연결</button>
+                    </div>
+                </div>
+
+                <!-- Google Forms -->
                 <div class="setup-section">
                     <h3>🏃‍♂️ 기록 입력</h3>
                     <div class="iframe-container" id="forms-container">
                         <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #6b7280; text-align: center; font-size: 0.9rem;">
-                            자동 연결 중...
+                            Forms 연결 후<br>여기서 기록 입력
                         </div>
                     </div>
                 </div>
