@@ -313,33 +313,43 @@
         <div class="main-content">
             <!-- 왼쪽 패널: 설정 -->
             <div class="left-panel">
-                <!-- CSV 설정 -->
-                <div class="setup-section">
-                    <h3>📊 데이터 연결</h3>
-                    <div class="input-group">
-                        <label>스프레드시트 CSV URL</label>
-                        <input type="url" id="csvUrl" placeholder="CSV URL을 입력하세요">
-                        <button class="btn" onclick="loadData()">데이터 로드</button>
-                        <div id="status"></div>
+                <!-- 관리자 설정 토글 버튼 -->
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <button class="btn" onclick="toggleAdminSettings()" id="admin-toggle" style="width: auto; padding: 6px 12px; font-size: 0.8rem; background: #6b7280;">
+                        ⚙️ 관리자 설정
+                    </button>
+                </div>
+
+                <!-- 관리자 설정 영역 (기본 숨김) -->
+                <div id="admin-settings" style="display: none;">
+                    <!-- CSV 설정 -->
+                    <div class="setup-section">
+                        <h3>📊 데이터 연결</h3>
+                        <div class="input-group">
+                            <label>스프레드시트 CSV URL</label>
+                            <input type="url" id="csvUrl" placeholder="CSV URL을 입력하세요">
+                            <button class="btn" onclick="loadData()">데이터 로드</button>
+                            <div id="status"></div>
+                        </div>
+                    </div>
+
+                    <!-- Forms 설정 -->
+                    <div class="setup-section">
+                        <h3>📝 Forms 연결</h3>
+                        <div class="input-group">
+                            <label>Google Forms 임베드 코드</label>
+                            <textarea id="formsEmbed" placeholder="<iframe src=...></iframe>"></textarea>
+                            <button class="btn" onclick="embedForms()">Forms 연결</button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Forms 설정 -->
-                <div class="setup-section">
-                    <h3>📝 Forms 연결</h3>
-                    <div class="input-group">
-                        <label>Google Forms 임베드 코드</label>
-                        <textarea id="formsEmbed" placeholder="<iframe src=...></iframe>"></textarea>
-                        <button class="btn" onclick="embedForms()">Forms 연결</button>
-                    </div>
-                </div>
-
-                <!-- Google Forms -->
+                <!-- Google Forms (항상 표시) -->
                 <div class="setup-section">
                     <h3>🏃‍♂️ 기록 입력</h3>
                     <div class="iframe-container" id="forms-container">
                         <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #6b7280; text-align: center; font-size: 0.9rem;">
-                            Forms 연결 후<br>여기서 기록 입력
+                            자동 연결 중...
                         </div>
                     </div>
                 </div>
@@ -424,34 +434,69 @@
         let records = [];
         let charts = {};
         
+        // 기본 설정값 (실제 URL로 자동 연결)
+        const DEFAULT_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSxKnN2BUIBcbNrpywGy2F_YjLnzWjabSOSCO_Kmwnq-mvia1E6g4ezt5nwwEj-3CWblrJO1xjaLTk/pub?output=csv';
+        const DEFAULT_FORMS_EMBED = '<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfToqiLU4-8Ckl23xO3y_r6dvjSDheU6TgALlvd2QT0e0na-Q/viewform?embedded=true" width="100%" height="350" frameborder="0" marginheight="0" marginwidth="0">로드 중…</iframe>';
+        
         // 초기화
         document.addEventListener('DOMContentLoaded', function() {
-            const savedCsvUrl = localStorage.getItem('csvUrl');
-            const savedFormsEmbed = localStorage.getItem('formsEmbed');
+            console.log('시스템 초기화 시작');
             
-            if (savedCsvUrl) {
-                document.getElementById('csvUrl').value = savedCsvUrl;
-                loadData();
-            }
+            // 저장된 값이 있으면 사용, 없으면 기본값 사용
+            const savedCsvUrl = localStorage.getItem('csvUrl') || DEFAULT_CSV_URL;
+            const savedFormsEmbed = localStorage.getItem('formsEmbed') || DEFAULT_FORMS_EMBED;
             
-            if (savedFormsEmbed) {
-                document.getElementById('formsEmbed').value = savedFormsEmbed;
-                embedForms();
-            }
+            document.getElementById('csvUrl').value = savedCsvUrl;
+            document.getElementById('formsEmbed').value = savedFormsEmbed;
+            
+            // 자동으로 연결 실행
+            autoConnect();
+            
+            console.log('자동 연결 완료');
         });
+        
+        // 자동 연결 함수
+        function autoConnect() {
+            // Google Forms 자동 연결
+            embedForms();
+            
+            // 데이터 자동 로드
+            loadData();
+        }
+        
+        // 관리자 설정 토글
+        function toggleAdminSettings() {
+            const adminSettings = document.getElementById('admin-settings');
+            const toggleBtn = document.getElementById('admin-toggle');
+            
+            if (adminSettings.style.display === 'none') {
+                adminSettings.style.display = 'block';
+                toggleBtn.textContent = '❌ 설정 숨기기';
+                toggleBtn.style.background = '#ef4444';
+            } else {
+                adminSettings.style.display = 'none';
+                toggleBtn.textContent = '⚙️ 관리자 설정';
+                toggleBtn.style.background = '#6b7280';
+            }
+        }
         
         function embedForms() {
             const embedCode = document.getElementById('formsEmbed').value.trim();
             const container = document.getElementById('forms-container');
             
             if (!embedCode) {
-                showStatus('error', 'Forms 임베드 코드를 입력해주세요.');
+                container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #6b7280; text-align: center; font-size: 0.9rem;">Forms 임베드 코드를 입력해주세요</div>';
                 return;
             }
             
             container.innerHTML = embedCode;
             localStorage.setItem('formsEmbed', embedCode);
-            showStatus('success', 'Google Forms 연결됨!');
+            
+            // 관리자 설정이 열려있을 때만 상태 메시지 표시
+            const adminSettings = document.getElementById('admin-settings');
+            if (adminSettings.style.display !== 'none') {
+                showStatus('success', 'Google Forms 연결됨!');
+            }
         }
         
         function findUserTeam(userId) {
@@ -472,21 +517,95 @@
             }
             
             try {
-                showStatus('warning', '로드 중...');
+                // 관리자 설정이 열려있을 때만 로딩 메시지 표시
+                const adminSettings = document.getElementById('admin-settings');
+                if (adminSettings.style.display !== 'none') {
+                    showStatus('warning', '로드 중...');
+                }
                 
-                const response = await fetch(csvUrl);
+                console.log('CSV 로드 시도:', csvUrl);
+                
+                let response;
+                try {
+                    // 직접 접근 시도
+                    response = await fetch(csvUrl);
+                } catch (corsError) {
+                    console.log('CORS 에러, 프록시 사용:', corsError);
+                    // CORS 우회를 위한 프록시 서비스 사용
+                    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(csvUrl)}`;
+                    const proxyResponse = await fetch(proxyUrl);
+                    const proxyData = await proxyResponse.json();
+                    
+                    if (proxyData.status.http_code === 200) {
+                        // 성공적으로 데이터 받음
+                        const csvText = proxyData.contents;
+                        console.log('프록시를 통해 CSV 데이터 수신:', csvText.substring(0, 200) + '...');
+                        
+                        records = parseCSV(csvText);
+                        console.log('파싱된 레코드 수:', records.length);
+                        
+                        localStorage.setItem('csvUrl', csvUrl);
+                        
+                        if (adminSettings.style.display !== 'none') {
+                            showStatus('success', `${records.length}개 기록 로드됨! (프록시 사용)`);
+                        }
+                        
+                        updateUI();
+                        return;
+                    } else {
+                        throw new Error('프록시를 통한 데이터 로드 실패');
+                    }
+                }
+                
+                // 직접 접근 성공한 경우
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
                 const csvText = await response.text();
+                console.log('직접 접근으로 CSV 데이터 수신:', csvText.substring(0, 200) + '...');
+                
                 records = parseCSV(csvText);
+                console.log('파싱된 레코드 수:', records.length);
                 
                 localStorage.setItem('csvUrl', csvUrl);
-                showStatus('success', `${records.length}개 기록 로드됨!`);
+                
+                if (adminSettings.style.display !== 'none') {
+                    showStatus('success', `${records.length}개 기록 로드됨!`);
+                }
+                
                 updateUI();
                 
             } catch (error) {
-                showStatus('error', `로드 실패: ${error.message}`);
+                console.error('데이터 로드 완전 실패:', error);
+                
+                // 더미 데이터로 폴백
+                loadDummyData();
+                
+                const adminSettings = document.getElementById('admin-settings');
+                if (adminSettings.style.display !== 'none') {
+                    showStatus('warning', `실제 데이터 로드 실패, 더미 데이터 사용: ${error.message}`);
+                } else {
+                    console.log('데이터 로드 실패하여 더미 데이터 사용');
+                }
             }
+        }
+        
+        // 더미 데이터 로드 함수 추가
+        function loadDummyData() {
+            records = [
+                { timestamp: '2025-01-15 10:30', userId: 'goinggoing', team: '우유', date: '2025-01-15', distance: 5.0 },
+                { timestamp: '2025-01-15 11:00', userId: '권초게', team: '포도', date: '2025-01-15', distance: 3.5 },
+                { timestamp: '2025-01-15 11:30', userId: '마커스', team: '우유', date: '2025-01-15', distance: 4.2 },
+                { timestamp: '2025-01-15 12:00', userId: '바다', team: '포도', date: '2025-01-15', distance: 6.1 },
+                { timestamp: '2025-01-15 12:30', userId: '봉무동러너', team: '우유', date: '2025-01-15', distance: 7.3 },
+                { timestamp: '2025-01-16 09:00', userId: '자달매', team: '포도', date: '2025-01-16', distance: 2.8 },
+                { timestamp: '2025-01-16 10:15', userId: '신욱재', team: '우유', date: '2025-01-16', distance: 6.5 },
+                { timestamp: '2025-01-17 08:45', userId: '삼남매맘', team: '우유', date: '2025-01-17', distance: 3.8 },
+                { timestamp: '2025-01-17 09:30', userId: '해피러너', team: '포도', date: '2025-01-17', distance: 5.2 },
+                { timestamp: '2025-01-17 10:00', userId: '우유키', team: '우유', date: '2025-01-17', distance: 4.9 }
+            ];
+            
+            console.log('더미 데이터 로드 완료:', records.length, '개');
+            updateUI();
         }
         
         function parseCSV(csvText) {
